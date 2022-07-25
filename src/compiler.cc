@@ -471,7 +471,7 @@ void Compiler::patch_jump(size_t offset)
 void Compiler::emit_loop(size_t loop_start)
 {
 	emit_byte(OP_LOOP);
-	auto offset = functions.top().chunk.size() - loop_start - 2;
+	auto offset = functions.top().chunk.size() - loop_start + 2;
 	if (offset > 0xffff)
 		error("Loop offset is out of bounds");
 
