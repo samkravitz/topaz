@@ -1,3 +1,4 @@
-*.o
-lex.yy.cc
 topaz
+topazd
+lex.yy.cc
+*.o

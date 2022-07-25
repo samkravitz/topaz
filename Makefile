@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++2a -g -DDEBUG -I $(INCLUDE)
+CXXFLAGS = -std=c++2a -I $(INCLUDE)
 LEX = flex -+
 VPATH = src
 INCLUDE = include
@@ -14,9 +14,18 @@ SRC = \
 
 OBJ = lex.yy.o $(SRC:.cc=.o)
 
-all: topaz
+all: release
+
+debug: CXXFLAGS += -DDEBUG -g
+debug: topazd
+
+release: CXX += -O2
+release: topaz
 
 topaz: main.cc $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $< $(OBJ)
+
+topazd: main.cc $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(OBJ)
 
 lex.yy.o: lex.ll
@@ -28,6 +37,6 @@ lex.yy.o: lex.ll
 
 .PHONY: clean
 clean:
-	rm -f topaz
+	rm -f topaz topazd
 	rm -f lex.yy.cc
 	rm -f *.o
