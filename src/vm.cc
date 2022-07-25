@@ -230,7 +230,30 @@ Value Vm::run(Function f)
 				break;
 			}
 
+			case OP_GET_SUBSCRIPT:
+			{
+				auto index = pop();
+				auto array_value = pop();
 
+				auto array = array_value->as_array();
+				push(std::make_shared<Value>(array[(int) index->as_number()]));
+
+				break;
+			}
+
+			case OP_SET_SUBSCRIPT:
+			{
+				auto element = pop();
+				auto index = pop();
+				auto array = pop();
+
+				array->store_at((int) index->as_number(), *element);
+				push(element);
+				break;
+			}
+
+			default:
+				assert(!"Unknown opcode");
 		}
 	}
 }
