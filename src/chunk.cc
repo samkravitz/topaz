@@ -23,6 +23,8 @@ void Chunk::disassemble(const char *name)
 	size_t offset = 0;
 	while (offset < code.size())
 		offset = disassemble_instruction(offset);
+	
+	std::printf("\n");
 }
 
 size_t Chunk::size()
@@ -36,7 +38,7 @@ size_t Chunk::disassemble_instruction(size_t offset)
 	if (offset != 0 && lines[offset] == lines[offset + 1])
 		std::printf("   | ");
 	else
-		std::printf("%04d ", lines[offset]);
+		std::printf("%*d ", 4, lines[offset]);
 
 	auto instruction = static_cast<Opcode>(code[offset]);
 	switch (instruction)
