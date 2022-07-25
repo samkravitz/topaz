@@ -1,6 +1,7 @@
 #include "vm.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <iostream>
 
@@ -96,7 +97,7 @@ Value Vm::run(Function f)
 			{
 				auto b = pop();
 				auto a = pop();
-				push(std::make_shared<Value>(a == b));
+				push(std::make_shared<Value>(*a == *b));
 				break;
 			}
 			
@@ -232,7 +233,78 @@ std::shared_ptr<Value> Vm::peek(uint offset)
 
 void Vm::binary_op(Operator op)
 {
+	if (!peek(0)->is_number() || !peek(1)->is_number())
+	{
+		runtime_error("Operands must be numbers");
+		exit(1);
+		return;
+	}
 
+	double result;
+	bool x;
+	auto b = pop()->as_number();
+	auto a = pop()->as_number();
+
+	switch (op)
+	{
+		case Operator::Plus:
+			result = a + b;
+			push(std::make_shared<Value>(result));
+			break;
+
+		case Operator::Minus:
+			result = a - b;
+			push(std::make_shared<Value>(result));
+			break;
+		
+		case Operator::Star:
+			result = a * b;
+			push(std::make_shared<Value>(result));
+			break;
+
+		case Operator::Slash:
+			result = b / a;
+			push(std::make_shared<Value>(result));
+			break;
+
+		case Operator::Mod:
+			result = (int) a % (int) b;
+			push(std::make_shared<Value>(result));
+			break;
+		
+		case Operator::LessThan:
+			x = a < b;
+			push(std::make_shared<Value>(x));
+			break;
+		
+		case Operator::GreaterThan:
+			x = a > b;
+			push(std::make_shared<Value>(x));
+			break;
+		
+		case Operator::Amp:
+			x = (int) a & (int) b;
+			push(std::make_shared<Value>(x));
+			break;
+
+		case Operator::AmpAmp:
+			x = (int) a && (int) b;
+			push(std::make_shared<Value>(x));
+			break;
+		
+		case Operator::Pipe:
+			x = (int) a | (int) b;
+			push(std::make_shared<Value>(x));
+			break;
+		
+		case Operator::PipePipe:
+			x = (int) a || (int) b;
+			push(std::make_shared<Value>(x));
+			break;
+		
+		default:
+			assert(!"Unreachable");
+	}
 }
 
 u8 Vm::read_byte()
@@ -263,5 +335,5 @@ void Vm::runtime_error(std::string const &msg)
 {
 	auto ip = frames.top().ip;
 	auto line = frames.top().function.chunk.lines[ip - 1];
-	std::printf("%s [line %d]", msg, line);
+	std::printf("%s [line %d]\n", msg.c_str(), line);
 }
