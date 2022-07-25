@@ -78,7 +78,7 @@
 	// Whitespace / comment
 %}
 
-#[^(\n|"\r\n")]*         { /* Comment */ }
+#.*                      { /* Comment */ }
 [ \t\n]                  { }
 
 %{
