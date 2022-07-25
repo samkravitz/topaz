@@ -148,8 +148,24 @@ Value Vm::run(Function f)
 			case OP_SET_GLOBAL:
 			{
 				auto constant = read_constant();
-				auto name = constant.as_string();
-				globals[name] = peek();
+				std::string name;
+				std::shared_ptr<Value> value;
+				if (constant.is_string())
+				{
+					name = constant.as_string();
+					value = peek();
+				}
+
+				else if (constant.is_fn())
+				{
+					name = constant.as_fn()->name;
+					value = std::make_shared<Value>(constant.as_fn());
+				}
+
+				else
+					assert(!"Error: got unknown type in OP_SET_GLOBAL");
+
+				globals[name] = value;
 				break;
 			}
 
@@ -194,6 +210,11 @@ Value Vm::run(Function f)
 
 			case OP_CALL:
 			{
+				auto num_args = read_byte();
+				auto fn = peek(num_args);
+
+				auto cf = CallFrame { *fn->as_fn(), stack.size() - num_args };
+				frames.push(cf);
 				break;
 			}
 

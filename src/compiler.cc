@@ -357,9 +357,11 @@ void Compiler::statement()
 			break;
 		case KEY_FN:
 			advance();
+			function_definition();
 			break;
 		case KEY_RETURN:
 			advance();
+			return_statement();
 			break;
 		default:
 			expression_statement();
@@ -420,6 +422,44 @@ void Compiler::return_statement()
     // TODO: don't parse expression if return is followed immediately by \n
 	expression();
 	emit_byte(OP_RETURN);
+}
+
+void Compiler::function_definition()
+{
+	auto name = current.value();
+
+	auto fn = Function { name };
+	functions.push(fn);
+	advance();
+
+	begin_scope();
+	consume(LEFT_PAREN, "Expect '(' after function name");
+
+	int num_params = 0;
+	while (!match(RIGHT_PAREN))
+	{
+		num_params += 1;
+		add_local(current);
+		consume(IDENTIFIER, "Expect identifier");
+	}
+
+	functions.top().num_params = num_params;
+	consume(LEFT_BRACE, "Expect '{' before function body");
+	block();
+
+	if (functions.top().chunk.code.empty())
+		emit_constant(Value(nullptr));
+	
+	emit_byte(OP_RETURN);
+	fn = functions.top();
+
+	#ifdef DEBUG
+	fn.chunk.disassemble(fn.name.c_str());
+	#endif
+
+	functions.pop();
+	auto global = make_constant(Value(std::make_shared<Function>(fn)));
+	emit_bytes(OP_SET_GLOBAL, global);
 }
 
 size_t Compiler::make_constant(Value value)
@@ -498,6 +538,7 @@ void Compiler::add_local(Token t)
 {
 	auto local = Local { t, scope_depth };
 	locals.push_back(local);
+	local_count++;
 }
 
 int Compiler::resolve_local(Token t)
