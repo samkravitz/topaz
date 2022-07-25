@@ -536,18 +536,18 @@ void Compiler::error_at(Token t, const char *msg)
 
 void Compiler::add_local(Token t)
 {
-	auto local = Local { t, scope_depth };
-	locals.push_back(local);
-	local_count++;
+	auto local = Local { t, -1 };
+	functions.top().locals.push_back(local);
 }
 
 int Compiler::resolve_local(Token t)
 {
+	auto local_count = functions.top().locals.size();
 	for (int i = local_count - 1; i >= 0; i--)
 	{
-		auto local = locals[i];
+		auto local = functions.top().locals[i];
 		if (t.value() == local.name.value())
-			return i;
+			return i + 1;
 	}
 
 	return -1;
@@ -555,14 +555,15 @@ int Compiler::resolve_local(Token t)
 
 void Compiler::begin_scope()
 {
-	scope_depth += 1;
+	functions.top().scope_depth += 1;
 }
 
 void Compiler::end_scope()
 {
-	scope_depth -= 1;
+	functions.top().scope_depth -= 1;
+	auto local_count = functions.top().locals.size();
 
-	while (local_count > 0 && locals[local_count - 1].depth > scope_depth)
+	while (local_count > 0 && functions.top().locals[local_count - 1].depth > functions.top().scope_depth)
 	{
 		emit_byte(OP_POP);
 		local_count -= 1;

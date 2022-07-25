@@ -35,7 +35,7 @@ Value Vm::run(Function f)
 				if (frames.empty())
 					return *result;
 				
-				auto diff = stack.size() - frame.base + 1;
+				auto diff = stack.size() - frame.base;
 				for (int i = 0; i < diff; i++)
 					pop();
 
@@ -213,7 +213,7 @@ Value Vm::run(Function f)
 				auto num_args = read_byte();
 				auto fn = peek(num_args);
 
-				auto cf = CallFrame { *fn->as_fn(), stack.size() - num_args };
+				auto cf = CallFrame { *fn->as_fn(), stack.size() - num_args - 1 };
 				frames.push(cf);
 				break;
 			}

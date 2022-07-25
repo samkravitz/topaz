@@ -26,12 +26,6 @@ enum Precedence : int
 	PREC_PRIMARY
 };
 
-// represents a local variable
-struct Local
-{
-	Token name;
-	uint depth;
-};
 
 class Compiler
 {
@@ -56,9 +50,6 @@ private:
 	Token current;
 	Token previous;
 	std::stack<Function> functions;
-	std::vector<Local> locals;
-	uint local_count = 0;
-	uint scope_depth = 0;
 
 	void advance();
 	void consume(TokenType, const char *);

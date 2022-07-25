@@ -10,7 +10,7 @@ fn fib(x) {
 # expect: 21
 print fib(8)
 
-fn count_down(y) {
+fn count_down(x) {
 	if x == 0 {
 		print 'blast off!'
 		return nil
