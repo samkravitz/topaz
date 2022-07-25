@@ -88,8 +88,8 @@ private:
 	void error_at_current(const char *);
 	void error_at(Token, const char *);
 
-	void add_local(std::string);
-	void resolve_local(Token);
+	void add_local(Token);
+	int resolve_local(Token);
 	void begin_scope();
 	void end_scope();
 };

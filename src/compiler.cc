@@ -291,14 +291,35 @@ void Compiler::unary(bool can_assign)
 
 void Compiler::variable(bool can_assign)
 {
-	auto identifier = previous.value();
+	auto identifier = previous;
+
+	Opcode get_op, set_op;
+	int value = resolve_local(identifier);
+
+	if (value == -1)
+	{
+		get_op = OP_GET_GLOBAL;
+		set_op = OP_SET_GLOBAL;
+		value = make_constant(identifier.value());
+	}
+
+	else
+	{
+		get_op = OP_GET_LOCAL;
+		set_op = OP_SET_LOCAL;
+	}
 
 
 	if (can_assign && match(EQUAL))
 	{
 		expression();
+		emit_bytes(set_op, value);
 	}
 
+	else
+	{
+		emit_bytes(get_op, value);
+	}
 }
 
 
@@ -473,22 +494,36 @@ void Compiler::error_at(Token t, const char *msg)
 	std::cout << "[line " << t.line() << " ] Error: " << msg << "\n";
 }
 
-void Compiler::add_local(std::string name)
+void Compiler::add_local(Token t)
 {
-
+	auto local = Local { t, scope_depth };
+	locals.push_back(local);
 }
 
-void Compiler::resolve_local(Token t)
+int Compiler::resolve_local(Token t)
 {
+	for (int i = local_count - 1; i >= 0; i--)
+	{
+		auto local = locals[i];
+		if (t.value() == local.name.value())
+			return i;
+	}
 
+	return -1;
 }
 
 void Compiler::begin_scope()
 {
-
+	scope_depth += 1;
 }
 
 void Compiler::end_scope()
 {
+	scope_depth -= 1;
 
+	while (local_count > 0 && locals[local_count - 1].depth > scope_depth)
+	{
+		emit_byte(OP_POP);
+		local_count -= 1;
+	}
 }
