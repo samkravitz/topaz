@@ -1,0 +1,10 @@
+# arrays can hold functions
+fn f() { print 'hello, array!' }
+arr = [f]
+
+# expect: [<fn f>]
+print arr
+
+# functions held inside arrays can be called! wow!
+# expect: hello, array!
+arr[0]()
