@@ -212,8 +212,9 @@ Value Vm::run(Function f)
 			{
 				auto num_args = read_byte();
 				auto fn = peek(num_args);
+				auto base = static_cast<uint>(stack.size() - num_args - 1);
 
-				auto cf = CallFrame { *fn->as_fn(), stack.size() - num_args - 1 };
+				auto cf = CallFrame { *fn->as_fn(), base };
 				frames.push(cf);
 				break;
 			}
