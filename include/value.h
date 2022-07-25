@@ -26,7 +26,8 @@ public:
 	std::shared_ptr<Function> as_fn();
 	std::vector<Value> as_array();
 
-	bool is_falsy();
+	bool is_number() const;
+	bool is_falsy() const;
 	std::string to_string();
 
 private:

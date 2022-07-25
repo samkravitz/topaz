@@ -1,5 +1,8 @@
 #include "value.h"
 
+#include <sstream>
+#include <iostream>
+
 #include "function.h"
 #include "chunk.h"
 
@@ -43,11 +46,11 @@ std::vector<Value> Value::as_array()
 	return std::get<std::vector<Value>>(value);
 }
 
-bool Value::is_falsy()
+bool Value::is_falsy() const
 {
-	if (bool b = std::get_if<bool>(&value))
+	if (const bool *b = std::get_if<bool>(&value))
 	{
-		return !b;
+		return !*b;
 	}
 
 	if (std::get_if<std::monostate>(&value))
@@ -56,6 +59,11 @@ bool Value::is_falsy()
 	}
 
 	return false;
+}
+
+bool Value::is_number() const
+{
+	return std::holds_alternative<double>(value);
 }
 
 std::string Value::to_string()
@@ -69,10 +77,25 @@ std::string Value::to_string()
 			return "nil";
 
 		else if constexpr (std::is_same_v<T, double>)
-			return std::to_string(arg);
+		{
+			if (arg == (int) arg)
+				return std::to_string((int) arg);
+
+			auto str = std::to_string(arg);
+			auto dec_index = str.find('.');
+			int precision = 0;
+			for (int i = dec_index + 1; i < str.size(); i++)
+			{
+				precision += 1;
+				if (str.at(i) != '0')
+					break;				
+			}
+
+			return str.substr(0, dec_index + precision + 1);
+		}
 
 		else if constexpr (std::is_same_v<T, std::string>)
-			return std::string("\"") + arg + std::string("\"");
+			return arg;
 
 		else if constexpr (std::is_same_v<T, std::shared_ptr<Function>>)
 		{
