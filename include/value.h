@@ -26,7 +26,13 @@ public:
 	std::shared_ptr<Function> as_fn();
 	std::vector<Value> as_array();
 
+	bool is_bool() const;
+	bool is_nil() const;
 	bool is_number() const;
+	bool is_string() const;
+	bool is_fn() const;
+	bool is_array() const;
+
 	bool is_falsy() const;
 	std::string to_string();
 

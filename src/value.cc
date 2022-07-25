@@ -61,9 +61,34 @@ bool Value::is_falsy() const
 	return false;
 }
 
+bool Value::is_bool() const
+{
+	return std::holds_alternative<bool>(value);
+}
+
+bool Value::is_nil() const
+{
+	return std::holds_alternative<std::monostate>(value);
+}
+
 bool Value::is_number() const
 {
 	return std::holds_alternative<double>(value);
+}
+
+bool Value::is_string() const
+{
+	return std::holds_alternative<std::string>(value);
+}
+
+bool Value::is_fn() const
+{
+	return std::holds_alternative<std::shared_ptr<Function>>(value);
+}
+
+bool Value::is_array() const
+{
+	return std::holds_alternative<std::vector<Value>>(value);
 }
 
 std::string Value::to_string()
@@ -99,7 +124,7 @@ std::string Value::to_string()
 
 		else if constexpr (std::is_same_v<T, std::shared_ptr<Function>>)
 		{
-			std::string res = "<fn " + arg->name + " >";
+			std::string res = "<fn " + arg->name + ">";
 			return res;
 		}
 
