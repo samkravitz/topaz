@@ -1,7 +1,7 @@
 require 'rspec'
 
 project_root = File.expand_path('..', __dir__)
-$topaz = File.join(project_root, 'target', 'release', 'topaz')
+$topaz = File.join(project_root, 'topaz')
 
 def run_dir(dir)
 	Dir.each_child(dir) do |filename|
