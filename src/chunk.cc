@@ -91,6 +91,12 @@ size_t Chunk::disassemble_instruction(size_t offset)
 			return jump_instruction("OP_LOOP", -1, offset);
 		case OP_CALL:
 			return byte_instruction("OP_CALL", offset);
+		case OP_BUILD_ARRAY:
+			return byte_instruction("OP_BUILD_ARRAY", offset);
+		case OP_GET_SUBSCRIPT:
+			return byte_instruction("OP_GET_SUBSCRIPT", offset);
+		case OP_SET_SUBSCRIPT:
+			return array_instruction("OP_SET_SUBSCRIPT", offset);
 		default:
 			std::printf("Unknown opcode: %d\n", instruction);
 			return offset + 1;
@@ -122,5 +128,15 @@ size_t Chunk::jump_instruction(const char *name, int sign, size_t offset)
 {
 	auto jump = (uint16_t) (code[offset + 1] << 8) | code[offset + 2];
 	std::printf("%-16s %4d -> %d\n", name, offset, offset + 3 + sign * jump);
+	return offset + 3;
+}
+
+size_t Chunk::array_instruction(const char *name, size_t offset)
+{
+	auto constant = code[offset + 1];
+	auto constant2 = code[offset + 2];
+	std::printf("%-16s %4d ", name, constant);
+	std::printf("%s ", constants[constant].to_string().c_str());
+	std::printf("%s\n", constants[constant2].to_string().c_str());
 	return offset + 3;
 }
