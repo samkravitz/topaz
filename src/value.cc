@@ -18,7 +18,29 @@ bool Value::operator==(const Value other)
 	if (value.index() != other.value.index())
 		return false;
 	
-	return true;
+	return std::visit([](auto &&val1, auto &&val2) -> bool {
+		using T1 = std::decay_t<decltype(val1)>;
+		using T2 = std::decay_t<decltype(val2)>;
+
+		if constexpr (!std::is_same_v<T1, T2>)
+			return false;
+
+        else if constexpr (std::is_same_v<T1, bool>)
+			return val1 == val2;
+
+		else if constexpr (std::is_same_v<T1, std::monostate>)
+			return true;
+		
+		else if constexpr (std::is_same_v<T1, double>)
+			return val1 == val2;
+		
+		else if constexpr (std::is_same_v<T1, std::string>)
+			return val1 == val2;
+
+		else
+			return false;
+
+	}, value, other.value);
 }
 
 bool Value::as_bool()
@@ -89,6 +111,13 @@ bool Value::is_fn() const
 bool Value::is_array() const
 {
 	return std::holds_alternative<std::vector<Value>>(value);
+}
+
+void Value::store_at(int index, Value v)
+{
+	auto array = as_array();
+	array[index] = v;
+	value = array;
 }
 
 std::string Value::to_string()

@@ -35,6 +35,7 @@ public:
 
 	bool is_falsy() const;
 	std::string to_string();
+	void store_at(int, Value);
 
 private:
 	std::variant<
