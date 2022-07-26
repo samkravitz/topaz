@@ -18,7 +18,7 @@ ParseRule rules[] = {
 	[LEFT_BRACKET]    = { &Compiler::array, &Compiler::subscript, PREC_SUBSCRIPT },
 	[RIGHT_BRACKET]   = { nullptr, nullptr, PREC_NONE },
 	[COMMA]           = { nullptr, nullptr, PREC_NONE },
-	[DOT]             = { nullptr, nullptr, PREC_NONE },
+	[DOT]             = { nullptr, &Compiler::dot, PREC_CALL },
 	[MINUS]           = { &Compiler::unary, &Compiler::binary, PREC_TERM },
 	[PLUS]            = { nullptr, &Compiler::binary, PREC_TERM },
 	[SLASH]           = { nullptr, &Compiler::binary, PREC_FACTOR },
@@ -220,6 +220,23 @@ void Compiler::call(bool can_assign)
 
 	consume(RIGHT_PAREN, "Expect ')' after arguments");
 	emit_bytes(OP_CALL, num_arguments);
+}
+
+void Compiler::dot(bool can_assign)
+{
+	consume(IDENTIFIER, "Expect identifier after '.'");
+	auto constant = make_constant(Value(previous.value()));
+
+	if (can_assign && match(EQUAL))
+	{
+		expression();
+		emit_bytes(OP_SET_PROPERTY, constant);
+	}
+	
+	else
+	{
+		emit_bytes(OP_GET_PROPERTY, constant);
+	}
 }
 
 void Compiler::grouping(bool can_assign)
@@ -472,6 +489,8 @@ void Compiler::class_declaration()
 	auto klass = make_constant(Value(previous.value()));
 
 	emit_bytes(OP_CLASS, klass);
+	emit_bytes(OP_SET_GLOBAL, klass);
+
 	consume(LEFT_BRACE, "Expect '{' before class body");
 	consume(RIGHT_BRACE, "Expect '}' after class body");
 }

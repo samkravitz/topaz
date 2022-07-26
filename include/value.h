@@ -6,6 +6,7 @@
 #include <variant>
 #include <vector>
 
+struct Instance;
 struct Function;
 struct Klass;
 
@@ -19,6 +20,7 @@ public:
 	Value(std::shared_ptr<Function>);
 	Value(std::vector<Value>);
 	Value(std::shared_ptr<Klass>);
+	Value(std::shared_ptr<Instance>);
 
 	bool operator==(const Value);
 
@@ -28,6 +30,7 @@ public:
 	std::shared_ptr<Function> as_fn();
 	std::vector<Value> as_array();
 	std::shared_ptr<Klass> as_klass();
+	std::shared_ptr<Instance> as_instance();
 
 	bool is_bool() const;
 	bool is_nil() const;
@@ -36,6 +39,7 @@ public:
 	bool is_fn() const;
 	bool is_array() const;
 	bool is_klass() const;
+	bool is_instance() const;
 
 	bool is_falsy() const;
 	std::string to_string();
@@ -49,6 +53,7 @@ private:
 		std::string,               // String
 		std::shared_ptr<Function>, // Fn
 		std::vector<Value>,        // Array
-		std::shared_ptr<Klass>     // Class
+		std::shared_ptr<Klass>,    // Class
+		std::shared_ptr<Instance>  // Instance
 	> value;
 };

@@ -1,0 +1,15 @@
+# construct a basic class
+class Topaz { }
+
+# construct an object of type Topaz
+topaz = Topaz()
+
+# add a field to object
+topaz.property = 'my field'
+
+# expect: my field
+print topaz.property
+
+# uninitialized fields default to nil
+# expect: nil
+print topaz.uninitialized

@@ -212,11 +212,27 @@ Value Vm::run(Function f)
 			case OP_CALL:
 			{
 				auto num_args = read_byte();
-				auto fn = peek(num_args);
-				auto base = static_cast<uint>(stack.size() - num_args - 1);
+				auto callable = peek(num_args);
 
-				auto cf = CallFrame { *fn->as_fn(), base };
-				frames.push(cf);
+				if (callable->is_fn())
+				{
+					auto base = static_cast<uint>(stack.size() - num_args - 1);
+					auto cf = CallFrame { *callable->as_fn(), base };
+					frames.push(cf);
+				}
+
+				else if (callable->is_klass())
+				{
+					auto klass = callable->as_klass();
+					auto instance = std::make_shared<Instance>(klass);
+					push(std::make_shared<Value>(instance));
+				}
+
+				else
+				{
+					assert(!"Tried to call an uncallable object");
+				}
+				
 				break;
 			}
 
@@ -259,6 +275,33 @@ Value Vm::run(Function f)
 				auto name = read_constant();
 				auto klass = std::make_shared<Klass>(name.as_string());
 				push(std::make_shared<Value>(klass));
+				break;
+			}
+
+			case OP_GET_PROPERTY:
+			{
+				auto instance = peek()->as_instance();
+				auto name = read_constant().as_string();
+
+				// if an instance's value isn't set, default to nil
+				auto property = std::make_shared<Value>(nullptr);
+
+				if (instance->fields.find(name) != instance->fields.end())
+					property = instance->fields[name];
+
+				push(property);
+				break;
+			}
+
+			case OP_SET_PROPERTY:
+			{
+				auto instance = peek(1)->as_instance();
+				auto name = read_constant().as_string();
+
+				auto property = pop();
+				instance->fields[name] = property;
+				pop();
+				push(property);
 				break;
 			}
 

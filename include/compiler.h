@@ -37,6 +37,7 @@ public:
 	void array(bool);
 	void binary(bool);
 	void call(bool);
+	void dot(bool);
 	void grouping(bool);
 	void literal(bool);
 	void number(bool);
