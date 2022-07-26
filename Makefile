@@ -7,6 +7,7 @@ SRC = \
 	chunk.cc \
 	compiler.cc \
 	function.cc \
+	klass.cc \
 	scanner.cc \
 	token.cc \
 	value.cc \

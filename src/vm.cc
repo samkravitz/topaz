@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <iostream>
 
+#include "klass.h"
 #include "opcode.h"
 
 Value Vm::run(Function f)
@@ -250,6 +251,14 @@ Value Vm::run(Function f)
 
 				array->store_at((int) index->as_number(), *element);
 				push(element);
+				break;
+			}
+
+			case OP_CLASS:
+			{
+				auto name = read_constant();
+				auto klass = std::make_shared<Klass>(name.as_string());
+				push(std::make_shared<Value>(klass));
 				break;
 			}
 

@@ -7,6 +7,7 @@
 #include <vector>
 
 struct Function;
+struct Klass;
 
 class Value
 {
@@ -17,6 +18,7 @@ public:
 	Value(std::string);
 	Value(std::shared_ptr<Function>);
 	Value(std::vector<Value>);
+	Value(std::shared_ptr<Klass>);
 
 	bool operator==(const Value);
 
@@ -25,6 +27,7 @@ public:
 	std::string as_string();
 	std::shared_ptr<Function> as_fn();
 	std::vector<Value> as_array();
+	std::shared_ptr<Klass> as_klass();
 
 	bool is_bool() const;
 	bool is_nil() const;
@@ -32,6 +35,7 @@ public:
 	bool is_string() const;
 	bool is_fn() const;
 	bool is_array() const;
+	bool is_klass() const;
 
 	bool is_falsy() const;
 	std::string to_string();
@@ -44,6 +48,7 @@ private:
 		double,                    // Number
 		std::string,               // String
 		std::shared_ptr<Function>, // Fn
-		std::vector<Value>         // Array
+		std::vector<Value>,        // Array
+		std::shared_ptr<Klass>     // Class
 	> value;
 };

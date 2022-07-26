@@ -67,6 +67,7 @@ private:
 	void while_statement();
 	void return_statement();
 	void function_definition();
+	void class_declaration();
 
 	size_t make_constant(Value);
 	void emit_byte(u8);

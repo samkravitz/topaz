@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "function.h"
+#include "klass.h"
 #include "chunk.h"
 
 Value::Value(bool b) { value = b; }
@@ -12,6 +13,7 @@ Value::Value(double d) { value = d; }
 Value::Value(std::string s) { value = s; }
 Value::Value(std::shared_ptr<Function> fn) { value = fn; }
 Value::Value(std::vector<Value> vs) { value = vs; }
+Value::Value(std::shared_ptr<Klass> klass) { value = klass; }
 
 bool Value::operator==(const Value other)
 {
@@ -68,6 +70,11 @@ std::vector<Value> Value::as_array()
 	return std::get<std::vector<Value>>(value);
 }
 
+std::shared_ptr<Klass> Value::as_klass()
+{
+	return std::get<std::shared_ptr<Klass>>(value);
+}
+
 bool Value::is_falsy() const
 {
 	if (const bool *b = std::get_if<bool>(&value))
@@ -111,6 +118,11 @@ bool Value::is_fn() const
 bool Value::is_array() const
 {
 	return std::holds_alternative<std::vector<Value>>(value);
+}
+
+bool Value::is_klass() const
+{
+	return std::holds_alternative<std::shared_ptr<Klass>>(value);
 }
 
 void Value::store_at(int index, Value v)
@@ -167,6 +179,12 @@ std::string Value::to_string()
 					res += ", ";
 			}
 			res += "]";
+			return res;
+		}
+
+		else if constexpr (std::is_same_v<T, std::shared_ptr<Klass>>)
+		{
+			std::string res = "#<" + arg->name + ">";
 			return res;
 		}
 

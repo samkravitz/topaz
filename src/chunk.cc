@@ -97,6 +97,8 @@ size_t Chunk::disassemble_instruction(size_t offset)
 			return byte_instruction("OP_GET_SUBSCRIPT", offset);
 		case OP_SET_SUBSCRIPT:
 			return array_instruction("OP_SET_SUBSCRIPT", offset);
+		case OP_CLASS:
+			return constant_instruction("OP_CLASS", offset);
 		default:
 			std::printf("Unknown opcode: %d\n", instruction);
 			return offset + 1;

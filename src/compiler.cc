@@ -363,6 +363,10 @@ void Compiler::statement()
 			advance();
 			return_statement();
 			break;
+		case KEY_CLASS:
+			advance();
+			class_declaration();
+			break;
 		default:
 			expression_statement();
 	}
@@ -460,6 +464,16 @@ void Compiler::function_definition()
 	functions.pop();
 	auto global = make_constant(Value(std::make_shared<Function>(fn)));
 	emit_bytes(OP_SET_GLOBAL, global);
+}
+
+void Compiler::class_declaration()
+{
+	consume(IDENTIFIER, "Expect class name");
+	auto klass = make_constant(Value(previous.value()));
+
+	emit_bytes(OP_CLASS, klass);
+	consume(LEFT_BRACE, "Expect '{' before class body");
+	consume(RIGHT_BRACE, "Expect '}' after class body");
 }
 
 size_t Compiler::make_constant(Value value)
