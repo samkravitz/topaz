@@ -1,0 +1,59 @@
+program -> expression*
+
+expression -> class_declaration
+	| function_declaration
+    | if_expression
+	| print_expression
+	| return_expression
+	| while_expression
+	| arg
+
+class_declaration -> "class" identifier "{" "}"
+
+function_declaration -> "fn" identifier "(" (identifier)* ")" block
+
+if_expression -> "if" expression block else_expression?
+
+else_expression -> "else" (if_expression | block)
+
+print_expression -> "print" expression
+
+return_expression -> "return" expression
+
+while_expression -> "while" expression block
+
+block -> "{" expression* "}"
+
+arg -> identifier "=" expression
+	| arg "||" arg
+	| arg "&&" arg
+	| arg ("==" | "!=") arg 
+	| arg ("<" | ">" | "<=" | ">=") arg
+	| arg ("*" | "/" | "%") arg
+	| arg ("+"| "-") arg
+	| ("+" | "-") arg
+	| "!" arg
+	| identifier ( "(" arguments? ")" | "." identifier)*
+	| "[" arguments? "]"
+	| primary
+
+primary -> "true"
+	| "false"
+	| "nil"
+	| "self"
+	| number
+	| string
+	| identifier
+	| "(" expression ")"
+
+arguments -> arg ("," arg)*
+
+number -> digit+ ("." digit+)?
+
+string -> (' | ") <any char>* (' | ")
+
+identifier -> char (char | digit)*
+
+digit -> "0" .. "9"
+
+char -> "a" .. "z" | "A" .. "Z" | _
