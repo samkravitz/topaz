@@ -1,6 +1,0 @@
-# expect: truth
-if true and true {
-	print 'truth'
-} else {
-	print 'false'
-}

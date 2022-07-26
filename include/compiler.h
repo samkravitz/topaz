@@ -59,15 +59,12 @@ private:
 	void parse_precedence(Precedence);
 
 	void expression();
-	void declaration();
-	void statement();
-	void expression_statement();
 	void block();
-	void print_statement();
-	void if_statement();
-	void while_statement();
-	void return_statement();
-	void function_definition();
+	void print_expression();
+	void if_expression();
+	void while_expression();
+	void return_expression();
+	void function_declaration();
 	void class_declaration();
 
 	size_t make_constant(Value);

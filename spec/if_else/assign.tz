@@ -1,0 +1,25 @@
+# the result of an if expression can be assigned to a variable
+x = if true {
+	'blue'
+}
+
+# expect: blue
+print x
+
+# also works if the 'else' branch is chosen at runtime
+x = if false {
+	'blue'
+} else {
+	'red'
+}
+
+# expect: red
+print x
+
+# defaults to nil in lieu of else branch
+x = if false {
+	'green'
+}
+
+# expect: nil
+print x

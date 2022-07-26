@@ -77,7 +77,7 @@ Function Compiler::compile()
 	advance();
 
 	while (!match(TOKEN_EOF))
-		declaration();
+		expression();
 
 	emit_byte(OP_RETURN);
 	return functions.top();
@@ -342,110 +342,114 @@ void Compiler::variable(bool can_assign)
 
 void Compiler::expression()
 {
-	parse_precedence(PREC_ASSIGNMENT);
-}
-
-void Compiler::declaration()
-{
-	statement();
-}
-
-void Compiler::statement()
-{
-	switch (current.type())
+	if (match(KEY_CLASS))
 	{
-		case KEY_PRINT:
-			advance();
-			print_statement();
-			break;
-		case LEFT_BRACE:
-			advance();
-			begin_scope();
-			block();
-			end_scope();
-			break;
-		case KEY_IF:
-			advance();
-			if_statement();
-			break;
-		case KEY_WHILE:
-			advance();
-			while_statement();
-			break;
-		case KEY_FN:
-			advance();
-			function_definition();
-			break;
-		case KEY_RETURN:
-			advance();
-			return_statement();
-			break;
-		case KEY_CLASS:
-			advance();
-			class_declaration();
-			break;
-		default:
-			expression_statement();
+		class_declaration();
+		return;
 	}
-}
 
-void Compiler::expression_statement()
-{
-	expression();
+	if (match(KEY_FN))
+	{
+		function_declaration();
+		return;
+	}
+
+	if (match(KEY_IF))
+	{
+		if_expression();
+		return;
+	}
+
+	if (match(KEY_PRINT))
+	{
+		print_expression();
+		return;
+	}
+
+	if (match(KEY_RETURN))
+	{
+		return_expression();
+		return;
+	}
+
+	if (match(KEY_WHILE))
+	{
+		while_expression();
+		return;
+	}
+
+	parse_precedence(PREC_ASSIGNMENT);
 }
 
 void Compiler::block()
 {
 	while (current.type() != RIGHT_BRACE)
-		declaration();
+		expression();
 	
 	consume(RIGHT_BRACE, "Expect '}' after block");
 }
 
-void Compiler::print_statement()
+void Compiler::print_expression()
 {
 	expression();
 	emit_byte(OP_PRINT);
 }
 
-void Compiler::if_statement()
+void Compiler::if_expression()
 {
 	expression();
 	auto then_offset = emit_jump(OP_JUMP_IF_FALSE);
 	emit_byte(OP_POP);
-	statement();
+
+	consume(LEFT_BRACE, "Expect '{' before if block");
+	block();
 
 	auto else_offset = emit_jump(OP_JUMP);
 	emit_byte(OP_POP);
 	patch_jump(then_offset);
 
 	if (match(KEY_ELSE))
-		statement();
+	{
+		if (match(KEY_IF))
+		{
+			if_expression();
+			return;
+		}
+
+		consume(LEFT_BRACE, "Expect '{' before else block");
+		block();
+	}
+
+	// insert nil when there is an if without else
+	else
+		emit_byte(OP_NIL);
 	
 	patch_jump(else_offset);
 }
 
-void Compiler::while_statement()
+void Compiler::while_expression()
 {
 	auto loop_start = functions.top().chunk.size();
 	expression();
 	auto exit_offset = emit_jump(OP_JUMP_IF_FALSE);
 	emit_byte(OP_POP);
-	statement();
+	
+	consume(LEFT_BRACE, "Expect '{' before while block");
+	block();
 	emit_loop(loop_start);
 
 	patch_jump(exit_offset);
 	emit_byte(OP_POP);
 }
 
-void Compiler::return_statement()
+void Compiler::return_expression()
 {
     // TODO: don't parse expression if return is followed immediately by \n
 	expression();
 	emit_byte(OP_RETURN);
 }
 
-void Compiler::function_definition()
+void Compiler::function_declaration()
 {
 	auto name = current.value();
 

@@ -1,0 +1,5 @@
+# class declarations are expressions too!
+x = class Class { }
+
+# expect: Class
+print x
