@@ -28,7 +28,7 @@ bool Value::operator==(const Value other)
 		if constexpr (!std::is_same_v<T1, T2>)
 			return false;
 
-        else if constexpr (std::is_same_v<T1, bool>)
+		else if constexpr (std::is_same_v<T1, bool>)
 			return val1 == val2;
 
 		else if constexpr (std::is_same_v<T1, std::monostate>)
@@ -147,7 +147,7 @@ std::string Value::to_string()
 {
 	return std::visit([](auto &&arg) -> std::string {
 		using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, bool>)
+		if constexpr (std::is_same_v<T, bool>)
 			return arg ? "true" : "false";
 
 		else if constexpr (std::is_same_v<T, std::monostate>)

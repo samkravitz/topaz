@@ -444,7 +444,7 @@ void Compiler::while_expression()
 
 void Compiler::return_expression()
 {
-    // TODO: don't parse expression if return is followed immediately by \n
+	// TODO: don't parse expression if return is followed immediately by \n
 	expression();
 	emit_byte(OP_RETURN);
 }

@@ -2,7 +2,7 @@ program -> expression*
 
 expression -> class_declaration
 	| function_declaration
-    | if_expression
+	| if_expression
 	| print_expression
 	| return_expression
 	| while_expression
