@@ -7,7 +7,21 @@
 
 void repl()
 {
+	auto vm = Vm {};
+	auto line_num = 0;
+	std::string line;
 
+	while (1)
+	{
+		std::cout << "> ";
+		std::getline(std::cin, line);
+
+		if (line == "exit")
+			break;
+		
+		auto fn = Compiler(line.data()).compile();
+		vm.run(fn);
+	}
 }
 
 void run_file(const char *fname)
